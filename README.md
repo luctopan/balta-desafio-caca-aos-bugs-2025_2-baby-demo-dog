@@ -2,7 +2,7 @@
 
 ## 👻 Caça aos Bugs 2025 - Desafio 02 - Baby Demo Dog
 
-Oi, eu sou o [seu nome aqui] e este é o espaço onde compartilho minha jornada de aprendizado durante o desafio **Caça aos Bugs 2025**, realizado pelo [balta.io](https://balta.io). 👻
+Oi, eu sou o Alex e este é o espaço onde compartilho minha jornada de aprendizado durante o desafio **Caça aos Bugs 2025**, realizado pelo [balta.io](https://balta.io). 👻
 
 Aqui você vai encontrar projetos, exercícios e códigos que estou desenvolvendo durante o desafio. O objetivo é colocar a mão na massa, testar ideias e registrar minha evolução no mundo da tecnologia.
 
@@ -24,4 +24,4 @@ O desafio **Caça aos Bugs 2025** consiste em encontrar bugs e sugerir melhorias
 Banco de Dados.
 
 ### Veja meu progresso no desafio
-[Incluir link para o repositório central]
+[Repositório central do desafio](https://github.com/luctopan/balta-desafio-caca-aos-bugs-2025)
