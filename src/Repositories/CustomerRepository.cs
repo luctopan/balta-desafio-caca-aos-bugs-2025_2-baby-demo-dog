@@ -9,30 +9,41 @@ public interface ICustomerRepository: IRepository<Customer> {}
 public sealed class CustomerRepository(AppDbContext context) : ICustomerRepository
 {
     public async Task<Customer?> GetAsync(Guid id, CancellationToken ct = default) =>
-        await context.Customers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
+        await context
+            .Customers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
 
     public async Task<List<Customer>> GetAllAsync(CancellationToken ct = default) =>
-        await context.Customers.AsNoTracking().ToListAsync(ct);
+        await context
+            .Customers
+            .AsNoTracking()
+            .ToListAsync(ct);
 
-    public async Task<Customer> AddAsync(Customer entity, CancellationToken ct = default)
+    public async Task<Customer> AddAsync(Customer customer, CancellationToken ct = default)
     {
-        context.Customers.Add(entity);
+        context.Customers.Add(customer);
         await context.SaveChangesAsync(ct);
-        return entity;
+        
+        return customer;
     }
 
-    public async Task<Customer> UpdateAsync(Customer entity, CancellationToken ct = default)
+    public async Task<Customer> UpdateAsync(Customer customer, CancellationToken ct = default)
     {
-        context.Customers.Update(entity);
+        context.Customers.Update(customer);
         await context.SaveChangesAsync(ct);
-        return entity;
+        
+        return customer;
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var entity = await context.Customers.FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (entity is null) return;
-        context.Customers.Remove(entity);
+        var customer = await context.Customers.FirstOrDefaultAsync(x => x.Id == id, ct);
+        
+        if (customer is null)
+            return;
+        
+        context.Customers.Remove(customer);
         await context.SaveChangesAsync(ct);
     }
 

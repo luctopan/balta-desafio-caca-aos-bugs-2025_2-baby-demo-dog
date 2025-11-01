@@ -11,9 +11,9 @@ public static class MappingExtensions
     public static ProductReadDto ToReadDto(this Product product) =>
         new(product.Id, product.Title, product.Description, product.Slug, product.Price);
 
-    public static OrderLineReadDto ToReadDto(this OrderLine orderLine) =>
+    private static OrderLineReadDto ToReadDto(this OrderLine orderLine) =>
         new(orderLine.Id, orderLine.ProductId, orderLine.Product?.Title ?? string.Empty, orderLine.Quantity, orderLine.Total);
 
-    public static OrderReadDto ToReadDto(this Order o) =>
-        new(o.Id, o.CustomerId, o.CreatedAt, o.UpdatedAt, o.Lines.Select(l => l.ToReadDto()).ToList());
+    public static OrderReadDto ToReadDto(this Order order) =>
+        new(order.Id, order.CustomerId, order.CreatedAt, order.UpdatedAt, order.Lines.Select(l => l.ToReadDto()).ToList());
 }

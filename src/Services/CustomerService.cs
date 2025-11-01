@@ -8,8 +8,8 @@ public interface ICustomerService
 {
     Task<CustomerReadDto?> GetAsync(Guid id, CancellationToken ct = default);
     Task<List<CustomerReadDto>> ListAsync(CancellationToken ct = default);
-    Task<CustomerReadDto> CreateAsync(CustomerCreateDto dto, CancellationToken ct = default);
-    Task<CustomerReadDto?> UpdateAsync(Guid id, CustomerUpdateDto dto, CancellationToken ct = default);
+    Task<CustomerReadDto> CreateAsync(CustomerCreateDto customer, CancellationToken ct = default);
+    Task<CustomerReadDto?> UpdateAsync(Guid id, CustomerUpdateDto customer, CancellationToken ct = default);
     Task DeleteAsync(Guid id, CancellationToken ct = default);
 }
 
@@ -17,48 +17,49 @@ public sealed class CustomerService(ICustomerRepository repository) : ICustomerS
 {
     public async Task<CustomerReadDto?> GetAsync(Guid id, CancellationToken ct = default)
     {
-        var entity = await repository.GetAsync(id, ct);
-        if (entity is null) return null;
+        var customer = await repository.GetAsync(id, ct);
         
-        return new CustomerReadDto(entity.Id, entity.Name, entity.Email, entity.Phone, entity.BirthDate);
+        return customer is null
+            ? null
+            : new CustomerReadDto(customer.Id, customer.Name, customer.Email, customer.Phone, customer.BirthDate);
     }
 
     public async Task<List<CustomerReadDto>> ListAsync(CancellationToken ct = default)
     {
-        var list = await repository.GetAllAsync(ct);
+        var customers = await repository.GetAllAsync(ct);
         
-        return list.Select(e => new CustomerReadDto(e.Id, e.Name, e.Email, e.Phone, e.BirthDate)).ToList();
+        return customers.Select(customer => new CustomerReadDto(customer.Id, customer.Name, customer.Email, customer.Phone, customer.BirthDate)).ToList();
     }
 
-    public async Task<CustomerReadDto> CreateAsync(CustomerCreateDto dto, CancellationToken ct = default)
+    public async Task<CustomerReadDto> CreateAsync(CustomerCreateDto model, CancellationToken ct = default)
     {
-        var entity = new Customer
+        var customer = new Customer
         {
             Id = Guid.NewGuid(),
-            Name = dto.Name,
-            Email = dto.Email,
-            Phone = dto.Phone,
-            BirthDate = dto.BirthDate
+            Name = model.Name,
+            Email = model.Email,
+            Phone = model.Phone,
+            BirthDate = model.BirthDate
         };
 
-        await repository.AddAsync(entity, ct);
+        await repository.AddAsync(customer, ct);
         
-        return new CustomerReadDto(entity.Id, entity.Name, entity.Email, entity.Phone, entity.BirthDate);
+        return new CustomerReadDto(customer.Id, customer.Name, customer.Email, customer.Phone, customer.BirthDate);
     }
 
-    public async Task<CustomerReadDto?> UpdateAsync(Guid id, CustomerUpdateDto dto, CancellationToken ct = default)
+    public async Task<CustomerReadDto?> UpdateAsync(Guid id, CustomerUpdateDto model, CancellationToken ct = default)
     {
-        var entity = await repository.GetAsync(id, ct);
-        if (entity is null) return null;
+        var customer = await repository.GetAsync(id, ct);
+        if (customer is null) return null;
 
-        entity.Name = dto.Name;
-        entity.Email = dto.Email;
-        entity.Phone = dto.Phone;
-        entity.BirthDate = dto.BirthDate;
+        customer.Name = model.Name;
+        customer.Email = model.Email;
+        customer.Phone = model.Phone;
+        customer.BirthDate = model.BirthDate;
 
-        await repository.UpdateAsync(entity, ct);
+        await repository.UpdateAsync(customer, ct);
         
-        return new CustomerReadDto(entity.Id, entity.Name, entity.Email, entity.Phone, entity.BirthDate);
+        return new CustomerReadDto(customer.Id, customer.Name, customer.Email, customer.Phone, customer.BirthDate);
     }
 
     public Task DeleteAsync(Guid id, CancellationToken ct = default)

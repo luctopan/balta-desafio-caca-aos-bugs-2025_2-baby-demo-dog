@@ -10,33 +10,33 @@ public static class CustomerEndpoints
     {
         var group = app.MapGroup("/v1/customers");
 
-        group.MapGet("/", async ([FromServices] ICustomerService svc, CancellationToken ct) =>
+        group.MapGet("/", async ([FromServices] ICustomerService service, CancellationToken ct) =>
         {
-            var result = await svc.ListAsync(ct);
+            var result = await service.ListAsync(ct);
             return Results.Ok(result);
         });
 
-        group.MapGet("/{id:guid}", async ([FromServices] ICustomerService svc, Guid id, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async ([FromServices] ICustomerService service, Guid id, CancellationToken ct) =>
         {
-            var result = await svc.GetAsync(id, ct);
+            var result = await service.GetAsync(id, ct);
             return result is null ? Results.NotFound() : Results.Ok(result);
         });
 
-        group.MapPost("/", async ([FromServices] ICustomerService svc, [FromBody] CustomerCreateDto dto, CancellationToken ct) =>
+        group.MapPost("/", async ([FromServices] ICustomerService service, [FromBody] CustomerCreateDto customer, CancellationToken ct) =>
         {
-            var created = await svc.CreateAsync(dto, ct);
+            var created = await service.CreateAsync(customer, ct);
             return Results.Created($"/v1/customers/{created.Id}", created);
         });
 
-        group.MapPut("/{id:guid}", async ([FromServices] ICustomerService svc, Guid id, [FromBody] CustomerUpdateDto dto, CancellationToken ct) =>
+        group.MapPut("/{id:guid}", async ([FromServices] ICustomerService service, Guid id, [FromBody] CustomerUpdateDto customer, CancellationToken ct) =>
         {
-            var updated = await svc.UpdateAsync(id, dto, ct);
+            var updated = await service.UpdateAsync(id, customer, ct);
             return updated is null ? Results.NotFound() : Results.Ok(updated);
         });
 
-        group.MapDelete("/{id:guid}", async ([FromServices] ICustomerService svc, Guid id, CancellationToken ct) =>
+        group.MapDelete("/{id:guid}", async ([FromServices] ICustomerService service, Guid id, CancellationToken ct) =>
         {
-            await svc.DeleteAsync(id, ct);
+            await service.DeleteAsync(id, ct);
             return Results.NoContent();
         });
 

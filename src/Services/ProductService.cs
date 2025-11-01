@@ -8,8 +8,8 @@ public interface IProductService
 {
     Task<ProductReadDto?> GetAsync(Guid id, CancellationToken ct = default);
     Task<List<ProductReadDto>> ListAsync(CancellationToken ct = default);
-    Task<ProductReadDto> CreateAsync(ProductCreateDto dto, CancellationToken ct = default);
-    Task<ProductReadDto?> UpdateAsync(Guid id, ProductUpdateDto dto, CancellationToken ct = default);
+    Task<ProductReadDto> CreateAsync(ProductCreateDto product, CancellationToken ct = default);
+    Task<ProductReadDto?> UpdateAsync(Guid id, ProductUpdateDto product, CancellationToken ct = default);
     Task DeleteAsync(Guid id, CancellationToken ct = default);
 }
 
@@ -17,48 +17,49 @@ public sealed class ProductService(IProductRepository repository) : IProductServ
 {
     public async Task<ProductReadDto?> GetAsync(Guid id, CancellationToken ct = default)
     {
-        var entity = await repository.GetAsync(id, ct);
-        if (entity is null) return null;
-        
-        return new ProductReadDto(entity.Id, entity.Title, entity.Description, entity.Slug, entity.Price);
+        var product = await repository.GetAsync(id, ct);
+        return product is null
+            ? null
+            : new ProductReadDto(product.Id, product.Title, product.Description, product.Slug, product.Price);
     }
 
     public async Task<List<ProductReadDto>> ListAsync(CancellationToken ct = default)
     {
-        var list = await repository.GetAllAsync(ct);
+        var products = await repository.GetAllAsync(ct);
         
-        return list.Select(e => new ProductReadDto(e.Id, e.Title, e.Description, e.Slug, e.Price)).ToList();
+        return products.Select(product => new ProductReadDto(product.Id, product.Title, product.Description, product.Slug, product.Price)).ToList();
     }
 
-    public async Task<ProductReadDto> CreateAsync(ProductCreateDto dto, CancellationToken ct = default)
+    public async Task<ProductReadDto> CreateAsync(ProductCreateDto model, CancellationToken ct = default)
     {
-        var entity = new Product
+        var product = new Product
         {
             Id = Guid.NewGuid(),
-            Title = dto.Title,
-            Description = dto.Description,
-            Slug = dto.Slug,
-            Price = dto.Price
+            Title = model.Title,
+            Description = model.Description,
+            Slug = model.Slug,
+            Price = model.Price
         };
 
-        await repository.AddAsync(entity, ct);
+        await repository.AddAsync(product, ct);
         
-        return new ProductReadDto(entity.Id, entity.Title, entity.Description, entity.Slug, entity.Price);
+        return new ProductReadDto(product.Id, product.Title, product.Description, product.Slug, product.Price);
     }
 
-    public async Task<ProductReadDto?> UpdateAsync(Guid id, ProductUpdateDto dto, CancellationToken ct = default)
+    public async Task<ProductReadDto?> UpdateAsync(Guid id, ProductUpdateDto model, CancellationToken ct = default)
     {
-        var entity = await repository.GetAsync(id, ct);
-        if (entity is null) return null;
-
-        entity.Title = dto.Title;
-        entity.Description = dto.Description;
-        entity.Slug = dto.Slug;
-        entity.Price = dto.Price;
-
-        await repository.UpdateAsync(entity, ct);
+        var product = await repository.GetAsync(id, ct);
         
-        return new ProductReadDto(entity.Id, entity.Title, entity.Description, entity.Slug, entity.Price);
+        if (product is null) return null;
+
+        product.Title = model.Title;
+        product.Description = model.Description;
+        product.Slug = model.Slug;
+        product.Price = model.Price;
+
+        await repository.UpdateAsync(product, ct);
+        
+        return new ProductReadDto(product.Id, product.Title, product.Description, product.Slug, product.Price);
     }
 
     public Task DeleteAsync(Guid id, CancellationToken ct = default)

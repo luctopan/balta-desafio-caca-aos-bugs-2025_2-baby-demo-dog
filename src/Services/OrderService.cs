@@ -14,20 +14,20 @@ public sealed class OrderService(IOrderRepository orders, IProductRepository pro
 {
     public async Task<OrderReadDto?> GetAsync(Guid id, CancellationToken ct = default)
     {
-        var entity = await orders.GetAsync(id, ct);
-        if (entity is null) return null;
+        var order = await orders.GetAsync(id, ct);
+        if (order is null) return null;
 
         return new OrderReadDto(
-            entity.Id,
-            entity.CustomerId,
-            entity.CreatedAt,
-            entity.UpdatedAt,
-            entity.Lines.Select(l => new OrderLineReadDto(
-                l.Id,
-                l.ProductId,
-                l.Product?.Title ?? string.Empty,
-                l.Quantity,
-                l.Total
+            order.Id,
+            order.CustomerId,
+            order.CreatedAt,
+            order.UpdatedAt,
+            order.Lines.Select(line => new OrderLineReadDto(
+                line.Id,
+                line.ProductId,
+                line.Product?.Title ?? string.Empty,
+                line.Quantity,
+                line.Total
             )).ToList()
         );
     }
@@ -48,16 +48,16 @@ public sealed class OrderService(IOrderRepository orders, IProductRepository pro
 
         foreach (var line in lines)
         {
-            var prod = await products.GetAsync(line.ProductId, ct)
+            var product = await products.GetAsync(line.ProductId, ct)
                        ?? throw new InvalidOperationException($"Product {line.ProductId} not found");
 
             order.Lines.Add(new OrderLine
             {
                 Id = Guid.NewGuid(),
                 OrderId = order.Id,
-                ProductId = prod.Id,
+                ProductId = product.Id,
                 Quantity = line.Quantity,
-                Total = prod.Price * line.Quantity
+                Total = product.Price * line.Quantity
             });
         }
 
